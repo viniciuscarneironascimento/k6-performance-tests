@@ -10,6 +10,9 @@ jobs:
     name: Executar K6 Cloud
     runs-on: ubuntu-latest
 
+    outputs:
+      k6_url: ${{ steps.exibir_url.outputs.k6_url }}
+
     steps:
       - name: Clonar o repositório
         uses: actions/checkout@v3
@@ -24,7 +27,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y k6
 
-      - name: Executar teste no K6 Cloud e capturar URL
+      - name: Executar teste no K6 Cloud
+        id: exibir_url
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
         run: |
@@ -32,3 +36,11 @@ jobs:
           output=$(k6 cloud --exit-on-running scripts/teste-basico.js)
           url=$(echo "$output" | grep -oE 'https://[^ ]+')
           echo "::notice title=K6 Cloud::🔗 Resultado: $url"
+          echo "$url" > k6-url.txt
+          echo "k6_url=$url" >> $GITHUB_OUTPUT
+
+      - name: Publicar URL como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-url
+          path: k6-url.txt
