@@ -1,0 +1,29 @@
+name: Teste de Performance com K6 na Cloud
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  k6-test:
+    name: Executar K6 Cloud
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar o repositório
+        uses: actions/checkout@v3
+
+      - name: Instalar K6
+        run: |
+          curl -s https://packagecloud.io/install/repositories/loadimpact/k6/script.deb.sh | sudo bash
+          sudo apt-get install k6
+
+      - name: Executar teste no K6 Cloud e capturar URL
+        env:
+          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
+        run: |
+          echo "Executando teste de performance no K6 Cloud..."
+          output=$(k6 cloud scripts/teste-basico.js | tee /dev/tty)
+          url=$(echo "$output" | grep -oE 'https://[^ ]+')
+          echo "::notice title=K6 Cloud::🔗 Resultado: $url"
