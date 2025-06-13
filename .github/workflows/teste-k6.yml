@@ -29,7 +29,6 @@ jobs:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
         run: |
           echo "Executando teste de performance no K6 Cloud..."
-          output=$(k6 cloud scripts/teste-basico.js)
-          echo "$output"
-          url=$(echo "$output" | grep '^.*output: https://' | grep -o 'https://[^ ]*')
+          output=$(k6 cloud --exit-on-running scripts/teste-basico.js)
+          url=$(echo "$output" | grep -oE 'https://[^ ]+')
           echo "::notice title=K6 Cloud::🔗 Resultado: $url"
