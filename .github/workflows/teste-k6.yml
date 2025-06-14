@@ -1,8 +1,6 @@
 name: Teste de Performance com K6 na Cloud
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
